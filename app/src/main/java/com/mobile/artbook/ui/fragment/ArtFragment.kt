@@ -1,4 +1,4 @@
-package com.mobile.artbook.view
+package com.mobile.artbook.ui.fragment
 
 import android.os.Bundle
 import android.view.View
@@ -6,7 +6,10 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import com.mobile.artbook.R
 import com.mobile.artbook.databinding.FragmentArtsBinding
+import com.mobile.artbook.view.ArtFragmentDirections
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ArtFragment : Fragment(R.layout.fragment_arts) {
 
     private var fragmentBinding : FragmentArtsBinding ?= null
