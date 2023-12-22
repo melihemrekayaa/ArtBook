@@ -22,7 +22,7 @@ class ArtRepository @Inject constructor(
         artDao.deleteArt(art)
     }
 
-    override suspend fun getArt(): LiveData<List<Art>> {
+    override fun getArt(): LiveData<List<Art>> {
         return artDao.observeArts()
     }
 

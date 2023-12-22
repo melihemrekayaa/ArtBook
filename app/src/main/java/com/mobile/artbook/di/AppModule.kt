@@ -1,13 +1,18 @@
 package com.mobile.artbook.di
 
 import android.content.Context
+import androidx.room.Dao
 import androidx.room.Room
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import com.mobile.artbook.R
 import com.mobile.artbook.api.RetrofitAPI
-import com.mobile.artbook.datasource.ArtDataSource
 import com.mobile.artbook.repository.ArtRepository
+import com.mobile.artbook.repository.ArtRepositoryInterface
 import com.mobile.artbook.room.ArtDao
 import com.mobile.artbook.room.ArtDatabase
 import com.mobile.artbook.util.Util
+import com.mobile.artbook.util.Util.BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,40 +25,36 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class AppModule {
+object AppModule {
 
     @Provides
     @Singleton
-    fun getArtDataSource(adao: ArtDao) : ArtDataSource {
-        return ArtDataSource(adao)
-    }
+    fun injectRoomDatabase(@ApplicationContext context : Context) = Room.databaseBuilder(context,ArtDatabase::class.java,"ArtBookDB").build()
+
 
     @Provides
     @Singleton
-    fun getArtRepository(ads: ArtDataSource) : ArtRepository {
-        return ArtRepository(ads)
-    }
-
-    @Provides
-    @Singleton
-    fun getArtDao(@ApplicationContext context : Context) : ArtDao {
-        val vt = Room.databaseBuilder(
-            context,ArtDatabase::class.java,"ArtBookDB"
-        ).build()
-
-        return vt.getArtDao()
-    }
+    fun injectDao(database: ArtDatabase) = database.getArtDao()
 
     @Provides
     @Singleton
     fun injectRetrofitAPI() : RetrofitAPI {
 
-        val retrofit = Retrofit.Builder()
+        return Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl(Util.BASE_URL)
+            .baseUrl(BASE_URL)
             .build()
             .create(RetrofitAPI::class.java)
-
-        return retrofit
     }
+
+    @Provides
+    @Singleton
+    fun injectGlide(@ApplicationContext context: Context) = Glide.with(context)
+        .setDefaultRequestOptions(
+            RequestOptions().placeholder(R.drawable.ic_launcher_foreground)
+                .error(R.drawable.ic_launcher_foreground)
+        )
+    @Provides
+    @Singleton
+    fun injectNormalRepo(dao: ArtDao, api: RetrofitAPI) = ArtRepository(dao,api) as ArtRepositoryInterface
 }
